@@ -62,12 +62,12 @@
       "anbieter": "EnBW",
       "grundgebuehr": 5.99,
       "prices": {
-        "allego": 0.52,
-        "enbw": 0.45,
-        "ionity": 0.7,
-        "aral": 0.55,
-        "shell": 0.54,
-        "ewe": 0.51
+        "allego": 0.10,
+        "enbw": 0.10,
+        "ionity": 0.10,
+        "aral": 0.10,
+        "shell": 0.10,
+        "ewe": 0.20
       }
     },
     {
