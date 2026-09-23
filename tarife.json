@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "stand": "Beispieldaten",
+  "cpos": [
+    {
+      "id": "allego",
+      "name": "Allego"
+    },
+    {
+      "id": "enbw",
+      "name": "EnBW HPC"
+    },
+    {
+      "id": "ionity",
+      "name": "Ionity"
+    },
+    {
+      "id": "aral",
+      "name": "Aral pulse"
+    },
+    {
+      "id": "shell",
+      "name": "Shell Recharge"
+    },
+    {
+      "id": "ewe",
+      "name": "EWE Go"
+    }
+  ],
+  "tarife": [
+    {
+      "id": "adac",
+      "name": "ADAC e-Charge",
+      "anbieter": "ADAC",
+      "grundgebuehr": 0,
+      "prices": {
+        "allego": 0.59,
+        "enbw": 0.6,
+        "ionity": 0.79,
+        "aral": 0.62,
+        "shell": 0.61,
+        "ewe": 0.58
+      }
+    },
+    {
+      "id": "enbw_s",
+      "name": "EnBW mobility+ S",
+      "anbieter": "EnBW",
+      "grundgebuehr": 0,
+      "prices": {
+        "allego": 0.57,
+        "enbw": 0.51,
+        "ionity": 0.75,
+        "aral": 0.6,
+        "shell": 0.59,
+        "ewe": 0.56
+      }
+    },
+    {
+      "id": "enbw_m",
+      "name": "EnBW mobility+ M",
+      "anbieter": "EnBW",
+      "grundgebuehr": 5.99,
+      "prices": {
+        "allego": 0.52,
+        "enbw": 0.45,
+        "ionity": 0.7,
+        "aral": 0.55,
+        "shell": 0.54,
+        "ewe": 0.51
+      }
+    },
+    {
+      "id": "enbw_l",
+      "name": "EnBW mobility+ L",
+      "anbieter": "EnBW",
+      "grundgebuehr": 17.99,
+      "prices": {
+        "allego": 0.47,
+        "enbw": 0.36,
+        "ionity": 0.66,
+        "aral": 0.5,
+        "shell": 0.49,
+        "ewe": 0.46
+      }
+    },
+    {
+      "id": "maingau",
+      "name": "Maingau Autostrom",
+      "anbieter": "Maingau",
+      "grundgebuehr": 4.95,
+      "prices": {
+        "allego": 0.49,
+        "enbw": 0.55,
+        "ionity": 0.72,
+        "aral": 0.51,
+        "shell": 0.5,
+        "ewe": 0.48
+      }
+    },
+    {
+      "id": "shell_card",
+      "name": "Shell Recharge Card",
+      "anbieter": "Shell Recharge",
+      "grundgebuehr": 0,
+      "prices": {
+        "allego": 0.58,
+        "enbw": 0.59,
+        "ionity": 0.77,
+        "aral": 0.57,
+        "shell": 0.42,
+        "ewe": 0.57
+      }
+    }
+  ]
+}
