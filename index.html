@@ -973,13 +973,22 @@
     btn.className = 'cpo-btn';
     btn.textContent = c.name;
     btn.addEventListener('click', function () {
-      state.quickCpo = c.id;
-      state.cpo = c.id;
-      cpoSelect.value = c.id;
-      renderQuickFinder();
-      renderResults();
-      renderTips();
-    });
+  if (state.quickCpo === c.id) {
+    // Bereits ausgewählt → Auswahl entfernen
+    state.quickCpo = null;
+    state.cpo = null;
+    cpoSelect.value = '';
+  } else {
+    // Neuer Betreiber → auswählen
+    state.quickCpo = c.id;
+    state.cpo = c.id;
+    cpoSelect.value = c.id;
+  }
+
+  renderQuickFinder();
+  renderResults();
+  renderTips();
+});
     quickGrid.appendChild(btn);
   });
 
