@@ -646,32 +646,87 @@
 
 <script>
 (async function () {
-  // Tarife und Ladebetreiber kommen vollständig aus tarife.json.
-  // Dadurch müssen Preise und neue Tarife nicht mehr in dieser HTML-Datei geändert werden.
-  var cpos = [];
+  // Ladebetreiber bleiben Bestandteil der App; die Tarifwerte kommen aus tarife.csv.
+  // Dadurch können neue Tarife und Preise einfach als neue Zeile in der Tabelle ergänzt werden.
+  var cpos = [
+    { id: "allego", name: "Allego" },
+    { id: "enbw", name: "EnBW HPC" },
+    { id: "ionity", name: "Ionity" },
+    { id: "aral", name: "Aral pulse" },
+    { id: "shell", name: "Shell Recharge" },
+    { id: "ewe", name: "EWE Go" }
+  ];
   var tariffs = [];
 
+  function parseCsvLine(line) {
+    var result = [], current = "", quoted = false;
+    for (var i = 0; i < line.length; i++) {
+      var ch = line[i];
+      if (ch === '"') {
+        if (quoted && line[i + 1] === '"') { current += '"'; i++; }
+        else { quoted = !quoted; }
+      } else if (ch === ';' && !quoted) {
+        result.push(current); current = "";
+      } else {
+        current += ch;
+      }
+    }
+    result.push(current);
+    return result;
+  }
+
+  function parseCsvNumber(value) {
+    if (value == null || value === "") return null;
+    var text = String(value).trim().replace(/\./g, "").replace(",", ".");
+    var number = parseFloat(text);
+    return isNaN(number) ? null : number;
+  }
+
+  function parseTarifeCsv(csvText) {
+    var lines = csvText.replace(/^\uFEFF/, "").trim().split(/\r?\n/);
+    if (lines.length < 2) return [];
+
+    var headers = parseCsvLine(lines[0]).map(function (h) { return h.trim(); });
+    var index = {};
+    headers.forEach(function (h, i) { index[h] = i; });
+
+    var priceColumns = {
+      allego: "allego_eur_kwh",
+      enbw: "enbw_hpc_eur_kwh",
+      ionity: "ionity_eur_kwh",
+      aral: "aral_pulse_eur_kwh",
+      shell: "shell_recharge_eur_kwh",
+      ewe: "ewe_go_eur_kwh"
+    };
+
+    return lines.slice(1).filter(function (line) { return line.trim() !== ""; }).map(function (line) {
+      var cells = parseCsvLine(line);
+      var tariff = {
+        id: (cells[index.id] || "").trim(),
+        name: (cells[index.name] || "").trim(),
+        grundgebuehr: parseCsvNumber(cells[index.grundgebuehr_eur_monat]),
+        prices: {}
+      };
+      Object.keys(priceColumns).forEach(function (cpoId) {
+        tariff.prices[cpoId] = parseCsvNumber(cells[index[priceColumns[cpoId]]]);
+      });
+      return tariff;
+    }).filter(function (t) { return t.id && t.name; });
+  }
+
   try {
-    var tariffResponse = await fetch('./tarife.json', { cache: 'no-cache' });
-    if (!tariffResponse.ok) {
-      throw new Error('HTTP ' + tariffResponse.status);
-    }
-    var tariffData = await tariffResponse.json();
-
-    if (!Array.isArray(tariffData.cpos) || !Array.isArray(tariffData.tarife)) {
-      throw new Error('tarife.json hat nicht die erwartete Struktur.');
-    }
-
-    cpos = tariffData.cpos;
-    tariffs = tariffData.tarife;
+    var tariffResponse = await fetch('./tarife.csv?v=' + Date.now(), { cache: 'no-store' });
+    if (!tariffResponse.ok) throw new Error('HTTP ' + tariffResponse.status);
+    tariffs = parseTarifeCsv(await tariffResponse.text());
+    if (!tariffs.length) throw new Error('Keine Tarife in tarife.csv gefunden.');
   } catch (error) {
     console.error('Tarifdaten konnten nicht geladen werden:', error);
     document.body.innerHTML =
       '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#E8ECEA;color:#132420;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;">' +
         '<div style="max-width:420px;background:#fff;border:1px solid #D6DEDA;border-radius:20px;padding:24px;box-shadow:0 10px 34px rgba(19,36,32,.14);">' +
           '<h1 style="margin:0 0 10px;font-size:22px;">Tarifdaten konnten nicht geladen werden</h1>' +
-          '<p style="margin:0 0 10px;line-height:1.5;color:#5B6D67;">Bitte stelle sicher, dass <b>tarife.json</b> im selben GitHub-Projekt und im selben Ordner wie <b>index.html</b> liegt.</p>' +
-          '<p style="margin:0;line-height:1.5;color:#5B6D67;font-size:13px;">Beim direkten Öffnen der HTML-Datei als <code>file://</code> kann der Browser den JSON-Abruf blockieren. Über GitHub Pages funktioniert er.</p>' +
+          '<p style="margin:0 0 10px;line-height:1.5;color:#5B6D67;">Bitte stelle sicher, dass <b>tarife.csv</b> im selben GitHub-Projekt und im selben Ordner wie <b>index.html</b> liegt.</p>' +
+          '<p style="margin:0;line-height:1.5;color:#5B6D67;font-size:13px;">Beim direkten Öffnen der HTML-Datei als <code>file://</code> kann der Browser den CSV-Abruf blockieren. Über GitHub Pages funktioniert er.</p>' +
         '</div>' +
       '</div>';
     return;
