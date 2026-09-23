@@ -1,4 +1,4 @@
-const CACHE_NAME = "ladecheck-v1";
+const CACHE_NAME = "Elveo-v1";
 const APP_SHELL = [
   "./",
   "./index.html",
