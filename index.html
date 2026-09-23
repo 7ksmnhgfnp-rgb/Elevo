@@ -1,0 +1,2809 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#0E6E63">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="default"
+  >
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Ladecheck"
+  >
+
+  <link rel="manifest" href="manifest.json">
+  <link
+    rel="apple-touch-icon"
+    href="icon.png"
+  >
+
+  <title>Ladecheck – Ladetarif-Check</title>
+
+  <style>
+    :root {
+      --green: #0e6e63;
+      --green-dark: #07564e;
+      --green-light: #dff1ed;
+      --orange: #f2a83e;
+      --red: #d95757;
+
+      --bg: #eef2f0;
+      --card: rgba(255,255,255,.78);
+      --card-solid: #ffffff;
+      --text: #17201e;
+      --muted: #687571;
+      --border: rgba(20,50,45,.10);
+
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+
+      --shadow:
+        0 12px 35px rgba(21,50,45,.10);
+
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+      color: var(--text);
+      background:
+        radial-gradient(
+          circle at 20% 0%,
+          rgba(77,190,165,.16),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at 100% 20%,
+          rgba(242,168,62,.10),
+          transparent 30%
+        ),
+        var(--bg);
+
+      padding-top: var(--safe-top);
+      padding-bottom: calc(88px + var(--safe-bottom));
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 18px 16px 20px;
+    }
+
+    /* --------------------------------------------------
+       HEADER
+    -------------------------------------------------- */
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      object-fit: cover;
+      box-shadow: 0 7px 18px rgba(14,110,99,.20);
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+      line-height: 1.05;
+    }
+
+    .brand-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .header-button {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.75);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      font-size: 20px;
+    }
+
+    /* --------------------------------------------------
+       VIEWS
+    -------------------------------------------------- */
+
+    .view {
+      display: none;
+      animation: fadeIn .22s ease;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* --------------------------------------------------
+       CARDS
+    -------------------------------------------------- */
+
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+
+      border: 1px solid rgba(255,255,255,.75);
+      border-radius: var(--radius-xl);
+
+      padding: 20px;
+      margin-bottom: 14px;
+
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .card-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .section-title {
+      font-size: 27px;
+      font-weight: 850;
+      letter-spacing: -.8px;
+      margin: 6px 0 4px;
+    }
+
+    .section-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    /* --------------------------------------------------
+       HERO
+    -------------------------------------------------- */
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+
+      background:
+        linear-gradient(
+          135deg,
+          #0e6e63,
+          #168c7e
+        );
+
+      color: white;
+      padding: 25px;
+      border-radius: 30px;
+      margin-bottom: 15px;
+
+      box-shadow:
+        0 18px 45px rgba(14,110,99,.23);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      right: -65px;
+      top: -60px;
+      background: rgba(255,255,255,.10);
+    }
+
+    .hero-label {
+      font-size: 12px;
+      font-weight: 700;
+      opacity: .75;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .hero-value {
+      font-size: 42px;
+      font-weight: 850;
+      letter-spacing: -1.5px;
+      margin: 8px 0;
+    }
+
+    .hero-text {
+      font-size: 14px;
+      opacity: .85;
+    }
+
+    /* --------------------------------------------------
+       STAT GRID
+    -------------------------------------------------- */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .stat {
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,.75);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 7px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    /* --------------------------------------------------
+       BUTTONS
+    -------------------------------------------------- */
+
+    .button {
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 16px;
+      font-weight: 750;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+
+    .button:active {
+      transform: scale(.97);
+    }
+
+    .button-primary {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 9px 20px rgba(14,110,99,.20);
+    }
+
+    .button-secondary {
+      background: var(--green-light);
+      color: var(--green-dark);
+    }
+
+    .button-danger {
+      background: #fdeaea;
+      color: var(--red);
+    }
+
+    .button-full {
+      width: 100%;
+    }
+
+    /* --------------------------------------------------
+       FORM
+    -------------------------------------------------- */
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 750;
+      margin: 0 0 7px 3px;
+      color: var(--muted);
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      min-height: 49px;
+      border-radius: 15px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.85);
+      padding: 0 14px;
+      color: var(--text);
+      outline: none;
+    }
+
+    .input:focus,
+    .select:focus {
+      border-color: rgba(14,110,99,.45);
+      box-shadow: 0 0 0 4px rgba(14,110,99,.08);
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* --------------------------------------------------
+       TABS
+    -------------------------------------------------- */
+
+    .segmented {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(0,0,0,.06);
+      border-radius: 17px;
+      margin-bottom: 16px;
+    }
+
+    .segment {
+      flex: 1;
+      min-height: 42px;
+      border-radius: 13px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .segment.active {
+      background: white;
+      color: var(--green-dark);
+      box-shadow: 0 4px 12px rgba(0,0,0,.07);
+    }
+
+    /* --------------------------------------------------
+       TARIFFS
+    -------------------------------------------------- */
+
+    .tariff {
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 17px;
+      margin-bottom: 11px;
+    }
+
+    .tariff-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .tariff-name {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .tariff-provider {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .favorite {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #f2f4f3;
+      font-size: 18px;
+    }
+
+    .favorite.active {
+      background: #fff0cf;
+      color: #e49a1c;
+    }
+
+    .tariff-price {
+      font-size: 25px;
+      font-weight: 850;
+      margin-top: 14px;
+    }
+
+    .tariff-price span {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .tariff-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 11px;
+    }
+
+    .tag {
+      background: var(--green-light);
+      color: var(--green-dark);
+      border-radius: 9px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* --------------------------------------------------
+       CALCULATOR RESULT
+    -------------------------------------------------- */
+
+    .result {
+      background:
+        linear-gradient(
+          135deg,
+          #e2f3ef,
+          #f5faf8
+        );
+
+      border: 1px solid rgba(14,110,99,.10);
+      border-radius: 22px;
+      padding: 20px;
+      margin-top: 15px;
+    }
+
+    .result-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .result-value {
+      font-size: 34px;
+      font-weight: 850;
+      color: var(--green-dark);
+      margin: 5px 0;
+    }
+
+    .result-detail {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .comparison-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comparison-row:last-child {
+      border-bottom: 0;
+    }
+
+    .comparison-name {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .comparison-price {
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    /* --------------------------------------------------
+       ACCOUNT
+    -------------------------------------------------- */
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 17px;
+    }
+
+    .avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .profile-name {
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .profile-text {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    /* --------------------------------------------------
+       NOTICE
+    -------------------------------------------------- */
+
+    .notice {
+      display: flex;
+      gap: 11px;
+      padding: 15px;
+      border-radius: 18px;
+      background: #fff7e7;
+      color: #77531d;
+      margin-bottom: 14px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .notice-icon {
+      font-size: 18px;
+    }
+
+    /* --------------------------------------------------
+       BOTTOM NAV
+    -------------------------------------------------- */
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 50;
+
+      left: 50%;
+      transform: translateX(-50%);
+
+      bottom: calc(9px + var(--safe-bottom));
+
+      width: min(720px, calc(100% - 22px));
+
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+
+      padding: 7px;
+
+      background: rgba(255,255,255,.84);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 23px;
+
+      box-shadow:
+        0 15px 40px rgba(0,0,0,.14);
+    }
+
+    .nav-button {
+      min-height: 56px;
+      border-radius: 17px;
+      background: transparent;
+      color: #78837f;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      gap: 3px;
+
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .nav-icon {
+      font-size: 21px;
+      line-height: 1;
+    }
+
+    .nav-button.active {
+      background: var(--green-light);
+      color: var(--green-dark);
+    }
+
+    /* --------------------------------------------------
+       MODAL
+    -------------------------------------------------- */
+
+    .modal-backdrop {
+      position: fixed;
+      z-index: 100;
+
+      inset: 0;
+
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+
+      background: rgba(0,0,0,.38);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(760px, 100%);
+      max-height: 88vh;
+      overflow: auto;
+
+      background: #f7f9f8;
+      border-radius: 30px 30px 0 0;
+
+      padding:
+        12px 18px
+        calc(25px + var(--safe-bottom));
+
+      box-shadow: 0 -20px 60px rgba(0,0,0,.18);
+
+      animation: modalUp .22s ease;
+    }
+
+    @keyframes modalUp {
+      from {
+        transform: translateY(30px);
+        opacity: .7;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-handle {
+      width: 40px;
+      height: 5px;
+      border-radius: 5px;
+      background: #c8cfcc;
+      margin: 0 auto 20px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 21px;
+      font-weight: 850;
+    }
+
+    .close-button {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #e9edeb;
+      font-size: 20px;
+    }
+
+    /* --------------------------------------------------
+       EMPTY
+    -------------------------------------------------- */
+
+    .empty {
+      text-align: center;
+      padding: 30px 10px;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+
+    /* --------------------------------------------------
+       DESKTOP
+    -------------------------------------------------- */
+
+    @media (min-width: 700px) {
+      body {
+        padding-bottom: 25px;
+      }
+
+      .bottom-nav {
+        position: sticky;
+        transform: none;
+        left: auto;
+        bottom: auto;
+        margin: 20px auto 0;
+      }
+
+      .app {
+        padding-top: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+
+    <div class="brand">
+
+      <img
+        src="icon.png"
+        class="brand-icon"
+        alt="Elevo"
+      >
+
+      <div>
+        <div class="brand-title">
+          Ladecheck
+        </div>
+
+        <div class="brand-subtitle">
+          Ladetarif-Check
+        </div>
+      </div>
+
+    </div>
+
+    <button
+      class="header-button"
+      onclick="openInfo()"
+      aria-label="Information"
+    >
+      ⓘ
+    </button>
+
+  </header>
+
+
+  <!-- ================================================
+       HOME
+  ================================================= -->
+
+  <main
+    id="view-home"
+    class="view active"
+  >
+
+    <div class="hero">
+
+      <div class="hero-label">
+        Dein aktueller Favorit
+      </div>
+
+      <div
+        id="homeFavorite"
+        class="hero-value"
+      >
+        EnBW mobility+ L
+      </div>
+
+      <div
+        id="homeFavoriteText"
+        class="hero-text"
+      >
+        0,47 €/kWh bei Allego
+      </div>
+
+    </div>
+
+
+    <div class="stats">
+
+      <div class="stat">
+        <div class="stat-label">
+          Heimstrom
+        </div>
+
+        <div
+          id="homeElectricity"
+          class="stat-value"
+        >
+          0,32 €/kWh
+        </div>
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          Fahrzeug
+        </div>
+
+        <div
+          id="homeVehicle"
+          class="stat-value"
+        >
+          19 kWh
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        Schnellzugriff
+      </div>
+
+      <div class="card-subtitle">
+        Berechne deine Ladekosten oder vergleiche deine Tarife.
+      </div>
+
+      <div
+        style="
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:10px;
+          margin-top:16px;
+        "
+      >
+
+        <button
+          class="button button-primary"
+          onclick="showView('calculator')"
+        >
+          ⚡ Laden
+        </button>
+
+        <button
+          class="button button-secondary"
+          onclick="showView('tariffs')"
+        >
+          € Tarife
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="notice">
+
+      <div class="notice-icon">
+        ⚠️
+      </div>
+
+      <div>
+        Die hinterlegten Tarife sind Beispielwerte.
+        Für eine produktive Version können später aktuelle
+        Tarifdaten über eine entsprechende Datenquelle eingebunden werden.
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- ================================================
+       RECHNER
+  ================================================= -->
+
+  <main
+    id="view-calculator"
+    class="view"
+  >
+
+    <div class="section-title">
+      Rechner
+    </div>
+
+    <div class="section-subtitle">
+      Lade- und Reisekosten schnell berechnen.
+    </div>
+
+
+    <div class="segmented">
+
+      <button
+        class="segment active"
+        id="calcTabCharge"
+        onclick="switchCalculator('charge')"
+      >
+        ⚡ Ladung
+      </button>
+
+      <button
+        class="segment"
+        id="calcTabTrip"
+        onclick="switchCalculator('trip')"
+      >
+        🚗 Reise
+      </button>
+
+    </div>
+
+
+    <!-- LADUNG -->
+
+    <section id="calculatorCharge">
+
+      <div class="card">
+
+        <div class="card-title">
+          Ladekosten
+        </div>
+
+        <div class="card-subtitle">
+          Gib Energiemenge und Ladepunkt ein.
+        </div>
+
+
+        <div class="field">
+          <label>
+            Energie
+          </label>
+
+          <div class="input-row">
+
+            <input
+              id="chargeKwh"
+              class="input"
+              type="number"
+              min="0"
+              step="0.1"
+              value="40"
+              oninput="calculateCharge()"
+            >
+
+            <div
+              style="
+                display:flex;
+                align-items:center;
+                padding-left:4px;
+                color:var(--muted);
+                font-size:13px;
+              "
+            >
+              kWh
+            </div>
+
+          </div>
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Ladeanbieter
+          </label>
+
+          <select
+            id="chargeCpo"
+            class="select"
+            onchange="calculateCharge()"
+          ></select>
+
+        </div>
+
+
+        <div
+          id="chargeResult"
+          class="result"
+        >
+
+          <div class="result-label">
+            Voraussichtliche Kosten
+          </div>
+
+          <div
+            id="chargeResultValue"
+            class="result-value"
+          >
+            20,80 €
+          </div>
+
+          <div
+            id="chargeResultDetail"
+            class="result-detail"
+          >
+            EnBW mobility+ L
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Tarifvergleich
+        </div>
+
+        <div class="card-subtitle">
+          Was kostet dieselbe Ladung mit deinen Tarifen?
+        </div>
+
+        <div id="chargeComparison"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- REISE -->
+
+    <section
+      id="calculatorTrip"
+      style="display:none;"
+    >
+
+      <div class="card">
+
+        <div class="card-title">
+          Reisekosten
+        </div>
+
+        <div class="card-subtitle">
+          Berechne deine ungefähren Ladekosten für eine Strecke.
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Strecke
+          </label>
+
+          <input
+            id="tripDistance"
+            class="input"
+            type="number"
+            min="0"
+            value="300"
+            oninput="calculateTrip()"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Verbrauch
+          </label>
+
+          <input
+            id="tripConsumption"
+            class="input"
+            type="number"
+            min="0"
+            step="0.1"
+            value="19"
+            oninput="calculateTrip()"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Tarif
+          </label>
+
+          <select
+            id="tripTariff"
+            class="select"
+            onchange="calculateTrip()"
+          ></select>
+
+        </div>
+
+
+        <div class="result">
+
+          <div class="result-label">
+            Energiekosten
+          </div>
+
+          <div
+            id="tripResult"
+            class="result-value"
+          >
+            26,79 €
+          </div>
+
+          <div
+            id="tripDetail"
+            class="result-detail"
+          >
+            ca. 57 kWh · 19 kWh/100 km
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ================================================
+       TARIFE
+  ================================================= -->
+
+  <main
+    id="view-tariffs"
+    class="view"
+  >
+
+    <div class="section-title">
+      Tarife
+    </div>
+
+    <div class="section-subtitle">
+      Deine hinterlegten Ladetarife.
+    </div>
+
+
+    <div class="segmented">
+
+      <button
+        id="tariffFilterOwned"
+        class="segment active"
+        onclick="setTariffFilter('owned')"
+      >
+        Meine Tarife
+      </button>
+
+      <button
+        id="tariffFilterAll"
+        class="segment"
+        onclick="setTariffFilter('all')"
+      >
+        Alle
+      </button>
+
+    </div>
+
+
+    <div id="tariffList"></div>
+
+  </main>
+
+
+  <!-- ================================================
+       KONTO
+  ================================================= -->
+
+  <main
+    id="view-account"
+    class="view"
+  >
+
+    <div class="section-title">
+      Konto
+    </div>
+
+    <div class="section-subtitle">
+      Fahrzeug und persönliche Einstellungen.
+    </div>
+
+
+    <div class="card">
+
+      <div class="profile">
+
+        <div
+          id="avatar"
+          class="avatar"
+        >
+          F
+        </div>
+
+        <div>
+
+          <div
+            id="profileName"
+            class="profile-name"
+          >
+            Fahrer
+          </div>
+
+          <div class="profile-text">
+            Deine Ladecheck-Einstellungen
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Name
+        </label>
+
+        <input
+          id="accountName"
+          class="input"
+          type="text"
+          value="Fahrer"
+          onchange="saveAccount()"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Fahrzeug
+        </label>
+
+        <select
+          id="accountVehicle"
+          class="select"
+          onchange="saveAccount()"
+        >
+
+          <option value="compact">
+            Kompakt · 16 kWh/100 km
+          </option>
+
+          <option value="medium">
+            Mittelklasse / SUV · 19 kWh/100 km
+          </option>
+
+          <option value="large">
+            Großes SUV / Van · 24 kWh/100 km
+          </option>
+
+          <option value="custom">
+            Eigener Verbrauch
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div
+        id="customConsumptionField"
+        class="field"
+        style="display:none;"
+      >
+
+        <label>
+          Eigener Verbrauch
+        </label>
+
+        <input
+          id="customConsumption"
+          class="input"
+          type="number"
+          min="1"
+          step="0.1"
+          value="20"
+          onchange="saveAccount()"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Heimstrompreis
+        </label>
+
+        <input
+          id="homePrice"
+          class="input"
+          type="number"
+          min="0"
+          step="0.01"
+          value="0.32"
+          onchange="saveAccount()"
+        >
+
+      </div>
+
+
+      <button
+        class="button button-primary button-full"
+        onclick="saveAccount()"
+      >
+        Einstellungen speichern
+      </button>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        Deine Tarife
+      </div>
+
+      <div class="card-subtitle">
+        Diese Tarife werden im Rechner berücksichtigt.
+      </div>
+
+      <div
+        id="ownedTariffs"
+        style="margin-top:15px;"
+      ></div>
+
+    </div>
+
+
+    <div class="notice">
+
+      <div class="notice-icon">
+        ℹ️
+      </div>
+
+      <div>
+        Deine Einstellungen werden lokal auf diesem Gerät gespeichert.
+        Die Tarifdaten in dieser Version sind Beispielwerte.
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<!-- ================================================
+     BOTTOM NAVIGATION
+================================================= -->
+
+<nav class="bottom-nav">
+
+  <button
+    id="nav-home"
+    class="nav-button active"
+    onclick="showView('home')"
+  >
+    <span class="nav-icon">⌂</span>
+    Home
+  </button>
+
+
+  <button
+    id="nav-calculator"
+    class="nav-button"
+    onclick="showView('calculator')"
+  >
+    <span class="nav-icon">⚡</span>
+    Rechner
+  </button>
+
+
+  <button
+    id="nav-tariffs"
+    class="nav-button"
+    onclick="showView('tariffs')"
+  >
+    <span class="nav-icon">€</span>
+    Tarife
+  </button>
+
+
+  <button
+    id="nav-account"
+    class="nav-button"
+    onclick="showView('account')"
+  >
+    <span class="nav-icon">●</span>
+    Konto
+  </button>
+
+</nav>
+
+
+<!-- ================================================
+     INFO MODAL
+================================================= -->
+
+<div
+  id="infoModal"
+  class="modal-backdrop"
+  onclick="closeInfo(event)"
+>
+
+  <div
+    class="modal"
+    onclick="event.stopPropagation()"
+  >
+
+    <div class="modal-handle"></div>
+
+    <div class="modal-header">
+
+      <div class="modal-title">
+        Ladecheck
+      </div>
+
+      <button
+        class="close-button"
+        onclick="closeInfo()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        Ladetarif-Check
+      </div>
+
+      <div class="card-subtitle">
+        Vergleiche deine Ladekosten und berechne,
+        welcher deiner hinterlegten Tarife an einem
+        Ladepunkt verwendet werden kann.
+      </div>
+
+    </div>
+
+
+    <div class="notice">
+
+      <div class="notice-icon">
+        ⚠️
+      </div>
+
+      <div>
+        Die Tarife und Preise in dieser Demo sind
+        Beispielwerte und keine Live-Preise.
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  /* ==================================================
+     TARIFDATEN
+  ================================================== */
+
+  const tariffs = [
+
+    {
+      id: "adac",
+      name: "ADAC e-Charge",
+      provider: "ADAC",
+      monthly: 0,
+      prices: {
+        allego: 0.59,
+        enbw: 0.60,
+        ionity: 0.79,
+        aral: 0.62,
+        shell: 0.61,
+        ewe: 0.58
+      }
+    },
+
+    {
+      id: "enbw_s",
+      name: "EnBW mobility+ S",
+      provider: "EnBW",
+      monthly: 0,
+      prices: {
+        allego: 0.57,
+        enbw: 0.51,
+        ionity: 0.75,
+        aral: 0.60,
+        shell: 0.59,
+        ewe: 0.56
+      }
+    },
+
+    {
+      id: "enbw_m",
+      name: "EnBW mobility+ M",
+      provider: "EnBW",
+      monthly: 5.99,
+      prices: {
+        allego: 0.52,
+        enbw: 0.45,
+        ionity: 0.70,
+        aral: 0.55,
+        shell: 0.54,
+        ewe: 0.51
+      }
+    },
+
+    {
+      id: "enbw_l",
+      name: "EnBW mobility+ L",
+      provider: "EnBW",
+      monthly: 17.99,
+      prices: {
+        allego: 0.47,
+        enbw: 0.36,
+        ionity: 0.66,
+        aral: 0.50,
+        shell: 0.49,
+        ewe: 0.46
+      }
+    },
+
+    {
+      id: "maingau",
+      name: "Maingau Autostrom",
+      provider: "Maingau",
+      monthly: 4.95,
+      prices: {
+        allego: 0.49,
+        enbw: 0.55,
+        ionity: 0.72,
+        aral: 0.51,
+        shell: 0.50,
+        ewe: 0.48
+      }
+    },
+
+    {
+      id: "shell",
+      name: "Shell Recharge Card",
+      provider: "Shell",
+      monthly: 0,
+      prices: {
+        allego: 0.58,
+        enbw: 0.59,
+        ionity: 0.77,
+        aral: 0.57,
+        shell: 0.42,
+        ewe: 0.57
+      }
+    }
+
+  ];
+
+
+  const cpos = [
+
+    {
+      id: "allego",
+      name: "Allego"
+    },
+
+    {
+      id: "enbw",
+      name: "EnBW HPC"
+    },
+
+    {
+      id: "ionity",
+      name: "Ionity"
+    },
+
+    {
+      id: "aral",
+      name: "Aral pulse"
+    },
+
+    {
+      id: "shell",
+      name: "Shell Recharge"
+    },
+
+    {
+      id: "ewe",
+      name: "EWE Go"
+    }
+
+  ];
+
+
+  /* ==================================================
+     FAHRZEUGE
+  ================================================== */
+
+  const vehicleConsumption = {
+    compact: 16,
+    medium: 19,
+    large: 24
+  };
+
+
+  /* ==================================================
+     STATE
+  ================================================== */
+
+  let state = {
+
+    currentView: "home",
+
+    calculatorMode: "charge",
+
+    tariffFilter: "owned",
+
+    ownedTariffs: [
+      "adac",
+      "enbw_m",
+      "enbw_l"
+    ],
+
+    favoriteTariff: "enbw_l",
+
+    account: {
+      name: "Fahrer",
+      vehicle: "medium",
+      customConsumption: 20,
+      homePrice: 0.32
+    }
+
+  };
+
+
+  /* ==================================================
+     LOCAL STORAGE
+  ================================================== */
+
+  function saveState() {
+
+    localStorage.setItem(
+      "ladecheckState",
+      JSON.stringify(state)
+    );
+
+  }
+
+
+  function loadState() {
+
+    try {
+
+      const saved =
+        localStorage.getItem("ladecheckState");
+
+      if (!saved) return;
+
+      const parsed = JSON.parse(saved);
+
+      state = {
+        ...state,
+        ...parsed,
+        account: {
+          ...state.account,
+          ...(parsed.account || {})
+        }
+      };
+
+    } catch (error) {
+
+      console.log(
+        "Keine gespeicherten Einstellungen gefunden."
+      );
+
+    }
+
+  }
+
+
+  /* ==================================================
+     FORMATIERUNG
+  ================================================== */
+
+  function euro(value) {
+
+    return value.toLocaleString(
+      "de-DE",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    ) + " €";
+
+  }
+
+
+  function price(value) {
+
+    return value.toLocaleString(
+      "de-DE",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    ) + " €/kWh";
+
+  }
+
+
+  /* ==================================================
+     VIEW NAVIGATION
+  ================================================== */
+
+  function showView(view) {
+
+    const views = [
+      "home",
+      "calculator",
+      "tariffs",
+      "account"
+    ];
+
+    views.forEach(function(name) {
+
+      const element =
+        document.getElementById(
+          "view-" + name
+        );
+
+      const nav =
+        document.getElementById(
+          "nav-" + name
+        );
+
+      if (element) {
+        element.classList.toggle(
+          "active",
+          name === view
+        );
+      }
+
+      if (nav) {
+        nav.classList.toggle(
+          "active",
+          name === view
+        );
+      }
+
+    });
+
+    state.currentView = view;
+
+    if (view === "home") {
+      updateHome();
+    }
+
+    if (view === "calculator") {
+      calculateCharge();
+      calculateTrip();
+    }
+
+    if (view === "tariffs") {
+      renderTariffs();
+    }
+
+    if (view === "account") {
+      renderAccount();
+    }
+
+    saveState();
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  }
+
+
+  /* ==================================================
+     HOME
+  ================================================== */
+
+  function updateHome() {
+
+    const favorite =
+      tariffs.find(
+        tariff =>
+          tariff.id === state.favoriteTariff
+      );
+
+    const cpo =
+      cpos.find(
+        item => item.id === "allego"
+      );
+
+    if (favorite) {
+
+      document.getElementById(
+        "homeFavorite"
+      ).textContent =
+        favorite.name;
+
+      document.getElementById(
+        "homeFavoriteText"
+      ).textContent =
+        price(favorite.prices.allego)
+        + " bei "
+        + cpo.name;
+
+    }
+
+
+    const consumption =
+      getConsumption();
+
+    document.getElementById(
+      "homeVehicle"
+    ).textContent =
+      consumption
+      .toLocaleString("de-DE")
+      + " kWh";
+
+
+    document.getElementById(
+      "homeElectricity"
+    ).textContent =
+      price(state.account.homePrice);
+
+  }
+
+
+  /* ==================================================
+     VERBRAUCH
+  ================================================== */
+
+  function getConsumption() {
+
+    if (
+      state.account.vehicle === "custom"
+    ) {
+
+      return Number(
+        state.account.customConsumption
+      ) || 20;
+
+    }
+
+    return vehicleConsumption[
+      state.account.vehicle
+    ] || 19;
+
+  }
+
+
+  /* ==================================================
+     CALCULATOR TABS
+  ================================================== */
+
+  function switchCalculator(mode) {
+
+    state.calculatorMode = mode;
+
+    const charge =
+      document.getElementById(
+        "calculatorCharge"
+      );
+
+    const trip =
+      document.getElementById(
+        "calculatorTrip"
+      );
+
+    const chargeTab =
+      document.getElementById(
+        "calcTabCharge"
+      );
+
+    const tripTab =
+      document.getElementById(
+        "calcTabTrip"
+      );
+
+    const isCharge =
+      mode === "charge";
+
+    charge.style.display =
+      isCharge ? "block" : "none";
+
+    trip.style.display =
+      isCharge ? "none" : "block";
+
+    chargeTab.classList.toggle(
+      "active",
+      isCharge
+    );
+
+    tripTab.classList.toggle(
+      "active",
+      !isCharge
+    );
+
+    if (isCharge) {
+      calculateCharge();
+    } else {
+      calculateTrip();
+    }
+
+  }
+
+
+  /* ==================================================
+     CALCULATOR SETUP
+  ================================================== */
+
+  function populateCpos() {
+
+    const select =
+      document.getElementById(
+        "chargeCpo"
+      );
+
+    select.innerHTML = "";
+
+    cpos.forEach(function(cpo) {
+
+      const option =
+        document.createElement("option");
+
+      option.value = cpo.id;
+      option.textContent = cpo.name;
+
+      select.appendChild(option);
+
+    });
+
+  }
+
+
+  function populateTripTariffs() {
+
+    const select =
+      document.getElementById(
+        "tripTariff"
+      );
+
+    select.innerHTML = "";
+
+    tariffs.forEach(function(tariff) {
+
+      const option =
+        document.createElement("option");
+
+      option.value = tariff.id;
+
+      option.textContent =
+        tariff.name;
+
+      if (
+        tariff.id === state.favoriteTariff
+      ) {
+        option.selected = true;
+      }
+
+      select.appendChild(option);
+
+    });
+
+  }
+
+
+  /* ==================================================
+     CHARGE CALCULATOR
+  ================================================== */
+
+  function calculateCharge() {
+
+    const kwh =
+      Number(
+        document.getElementById(
+          "chargeKwh"
+        )?.value
+      ) || 0;
+
+    const cpo =
+      document.getElementById(
+        "chargeCpo"
+      )?.value || "allego";
+
+    const favorite =
+      tariffs.find(
+        tariff =>
+          tariff.id === state.favoriteTariff
+      );
+
+    if (!favorite) return;
+
+    const tariffPrice =
+      favorite.prices[cpo];
+
+    const total =
+      kwh * tariffPrice;
+
+
+    document.getElementById(
+      "chargeResultValue"
+    ).textContent =
+      euro(total);
+
+
+    document.getElementById(
+      "chargeResultDetail"
+    ).textContent =
+      favorite.name
+      + " · "
+      + price(tariffPrice);
+
+
+    renderChargeComparison(
+      kwh,
+      cpo
+    );
+
+  }
+
+
+  function renderChargeComparison(
+    kwh,
+    cpo
+  ) {
+
+    const container =
+      document.getElementById(
+        "chargeComparison"
+      );
+
+    container.innerHTML = "";
+
+    const relevantTariffs =
+      tariffs.filter(function(tariff) {
+
+        return state.ownedTariffs
+          .includes(tariff.id);
+
+      });
+
+
+    if (!relevantTariffs.length) {
+
+      container.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">⚡</div>
+          Keine Tarife ausgewählt.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    relevantTariffs
+      .sort(function(a, b) {
+
+        return (
+          a.prices[cpo] -
+          b.prices[cpo]
+        );
+
+      })
+      .forEach(function(tariff) {
+
+        const row =
+          document.createElement("div");
+
+        row.className =
+          "comparison-row";
+
+        row.innerHTML = `
+
+          <div>
+            <div class="comparison-name">
+              ${tariff.name}
+            </div>
+
+            <div
+              style="
+                font-size:11px;
+                color:var(--muted);
+                margin-top:3px;
+              "
+            >
+              ${price(tariff.prices[cpo])}
+            </div>
+          </div>
+
+          <div class="comparison-price">
+            ${euro(
+              kwh * tariff.prices[cpo]
+            )}
+          </div>
+
+        `;
+
+        container.appendChild(row);
+
+      });
+
+  }
+
+
+  /* ==================================================
+     TRIP CALCULATOR
+  ================================================== */
+
+  function calculateTrip() {
+
+    const distance =
+      Number(
+        document.getElementById(
+          "tripDistance"
+        )?.value
+      ) || 0;
+
+    const consumption =
+      Number(
+        document.getElementById(
+          "tripConsumption"
+        )?.value
+      ) || 0;
+
+    const tariffId =
+      document.getElementById(
+        "tripTariff"
+      )?.value ||
+      state.favoriteTariff;
+
+    const tariff =
+      tariffs.find(
+        item => item.id === tariffId
+      );
+
+    if (!tariff) return;
+
+    const energy =
+      distance * consumption / 100;
+
+    /*
+      Für die Reise wird als Näherung
+      der Allego-Tarif verwendet.
+    */
+
+    const tariffPrice =
+      tariff.prices.allego;
+
+    const total =
+      energy * tariffPrice;
+
+
+    document.getElementById(
+      "tripResult"
+    ).textContent =
+      euro(total);
+
+
+    document.getElementById(
+      "tripDetail"
+    ).textContent =
+      Math.round(energy)
+      + " kWh · "
+      + consumption.toLocaleString("de-DE")
+      + " kWh/100 km · "
+      + tariff.name;
+
+  }
+
+
+  /* ==================================================
+     TARIFF LIST
+  ================================================== */
+
+  function setTariffFilter(filter) {
+
+    state.tariffFilter = filter;
+
+    document
+      .getElementById(
+        "tariffFilterOwned"
+      )
+      .classList.toggle(
+        "active",
+        filter === "owned"
+      );
+
+    document
+      .getElementById(
+        "tariffFilterAll"
+      )
+      .classList.toggle(
+        "active",
+        filter === "all"
+      );
+
+    renderTariffs();
+
+  }
+
+
+  function renderTariffs() {
+
+    const container =
+      document.getElementById(
+        "tariffList"
+      );
+
+    container.innerHTML = "";
+
+
+    let list = tariffs;
+
+    if (
+      state.tariffFilter === "owned"
+    ) {
+
+      list =
+        tariffs.filter(
+          tariff =>
+            state.ownedTariffs
+              .includes(tariff.id)
+        );
+
+    }
+
+
+    if (!list.length) {
+
+      container.innerHTML = `
+        <div class="card empty">
+          <div class="empty-icon">€</div>
+          Keine Tarife vorhanden.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    list.forEach(function(tariff) {
+
+      const isFavorite =
+        tariff.id ===
+        state.favoriteTariff;
+
+      const isOwned =
+        state.ownedTariffs
+          .includes(tariff.id);
+
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "tariff";
+
+
+      card.innerHTML = `
+
+        <div class="tariff-top">
+
+          <div>
+
+            <div class="tariff-name">
+              ${tariff.name}
+            </div>
+
+            <div class="tariff-provider">
+              ${tariff.provider}
+            </div>
+
+          </div>
+
+          <button
+            class="favorite ${isFavorite ? "active" : ""}"
+            onclick="setFavorite('${tariff.id}')"
+            aria-label="Favorit"
+          >
+            ${isFavorite ? "★" : "☆"}
+          </button>
+
+        </div>
+
+
+        <div class="tariff-price">
+
+          ${tariff.monthly === 0
+            ? "0 €"
+            : euro(tariff.monthly)
+          }
+
+          <span>
+            / Monat
+          </span>
+
+        </div>
+
+
+        <div class="tariff-tags">
+
+          <span class="tag">
+            Allego ${price(tariff.prices.allego)}
+          </span>
+
+          <span class="tag">
+            EnBW ${price(tariff.prices.enbw)}
+          </span>
+
+          <span class="tag">
+            Ionity ${price(tariff.prices.ionity)}
+          </span>
+
+        </div>
+
+
+        <div
+          style="
+            display:flex;
+            gap:8px;
+            margin-top:13px;
+          "
+        >
+
+          <button
+            class="button ${
+              isOwned
+                ? "button-secondary"
+                : "button-primary"
+            }"
+            style="flex:1;"
+            onclick="toggleOwned('${tariff.id}')"
+          >
+            ${
+              isOwned
+                ? "✓ Mein Tarif"
+                : "+ Hinzufügen"
+            }
+          </button>
+
+        </div>
+
+      `;
+
+      container.appendChild(card);
+
+    });
+
+  }
+
+
+  /* ==================================================
+     FAVORIT
+  ================================================== */
+
+  function setFavorite(id) {
+
+    state.favoriteTariff = id;
+
+    saveState();
+
+    updateHome();
+
+    renderTariffs();
+
+    calculateCharge();
+
+    populateTripTariffs();
+
+    calculateTrip();
+
+  }
+
+
+  /* ==================================================
+     EIGENE TARIFE
+  ================================================== */
+
+  function toggleOwned(id) {
+
+    const index =
+      state.ownedTariffs.indexOf(id);
+
+    if (index >= 0) {
+
+      state.ownedTariffs.splice(
+        index,
+        1
+      );
+
+      /*
+        Wenn der Favorit entfernt wurde,
+        wird automatisch der erste noch
+        vorhandene Tarif zum Favoriten.
+      */
+
+      if (
+        state.favoriteTariff === id
+      ) {
+
+        state.favoriteTariff =
+          state.ownedTariffs[0] ||
+          null;
+
+      }
+
+    } else {
+
+      state.ownedTariffs.push(id);
+
+    }
+
+    saveState();
+
+    renderTariffs();
+
+    renderAccount();
+
+    updateHome();
+
+    calculateCharge();
+
+  }
+
+
+  /* ==================================================
+     ACCOUNT
+  ================================================== */
+
+  function renderAccount() {
+
+    document.getElementById(
+      "accountName"
+    ).value =
+      state.account.name;
+
+
+    document.getElementById(
+      "profileName"
+    ).textContent =
+      state.account.name;
+
+
+    document.getElementById(
+      "avatar"
+    ).textContent =
+      (
+        state.account.name
+          .trim()
+          .charAt(0)
+          .toUpperCase()
+      ) || "F";
+
+
+    document.getElementById(
+      "accountVehicle"
+    ).value =
+      state.account.vehicle;
+
+
+    document.getElementById(
+      "customConsumption"
+    ).value =
+      state.account.customConsumption;
+
+
+    document.getElementById(
+      "homePrice"
+    ).value =
+      state.account.homePrice;
+
+
+    document.getElementById(
+      "customConsumptionField"
+    ).style.display =
+      state.account.vehicle === "custom"
+        ? "block"
+        : "none";
+
+
+    renderOwnedTariffs();
+
+  }
+
+
+  function saveAccount() {
+
+    state.account.name =
+      document.getElementById(
+        "accountName"
+      ).value.trim() ||
+      "Fahrer";
+
+
+    state.account.vehicle =
+      document.getElementById(
+        "accountVehicle"
+      ).value;
+
+
+    state.account.customConsumption =
+      Number(
+        document.getElementById(
+          "customConsumption"
+        ).value
+      ) || 20;
+
+
+    state.account.homePrice =
+      Number(
+        document.getElementById(
+          "homePrice"
+        ).value
+      ) || 0;
+
+
+    saveState();
+
+    renderAccount();
+
+    updateHome();
+
+  }
+
+
+  function renderOwnedTariffs() {
+
+    const container =
+      document.getElementById(
+        "ownedTariffs"
+      );
+
+    container.innerHTML = "";
+
+
+    const owned =
+      tariffs.filter(
+        tariff =>
+          state.ownedTariffs
+            .includes(tariff.id)
+      );
+
+
+    if (!owned.length) {
+
+      container.innerHTML = `
+        <div class="empty">
+          Noch keine eigenen Tarife.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    owned.forEach(function(tariff) {
+
+      const row =
+        document.createElement("div");
+
+      row.style.display =
+        "flex";
+
+      row.style.alignItems =
+        "center";
+
+      row.style.justifyContent =
+        "space-between";
+
+      row.style.padding =
+        "12px 0";
+
+      row.style.borderBottom =
+        "1px solid var(--border)";
+
+
+      row.innerHTML = `
+
+        <div>
+
+          <div
+            style="
+              font-size:14px;
+              font-weight:750;
+            "
+          >
+            ${tariff.name}
+          </div>
+
+          <div
+            style="
+              font-size:11px;
+              color:var(--muted);
+              margin-top:3px;
+            "
+          >
+            ${
+              tariff.id === state.favoriteTariff
+                ? "★ Favorit"
+                : "Eigener Tarif"
+            }
+          </div>
+
+        </div>
+
+        <button
+          class="button button-danger"
+          style="
+            min-height:38px;
+            padding:0 12px;
+          "
+          onclick="toggleOwned('${tariff.id}')"
+        >
+          Entfernen
+        </button>
+
+      `;
+
+      container.appendChild(row);
+
+    });
+
+  }
+
+
+  /* ==================================================
+     INFO MODAL
+  ================================================== */
+
+  function openInfo() {
+
+    document
+      .getElementById("infoModal")
+      .classList.add("show");
+
+  }
+
+
+  function closeInfo(event) {
+
+    if (
+      event &&
+      event.target !==
+      document.getElementById(
+        "infoModal"
+      )
+    ) {
+      return;
+    }
+
+    document
+      .getElementById("infoModal")
+      .classList.remove("show");
+
+  }
+
+
+  /* ==================================================
+     INITIALISIERUNG
+  ================================================== */
+
+  function init() {
+
+    loadState();
+
+    populateCpos();
+
+    populateTripTariffs();
+
+    renderAccount();
+
+    renderTariffs();
+
+    updateHome();
+
+    calculateCharge();
+
+    calculateTrip();
+
+    showView(
+      state.currentView || "home"
+    );
+
+  }
+
+
+  /* ==================================================
+     SERVICE WORKER / PWA
+  ================================================== */
+
+  if (
+    "serviceWorker" in navigator
+  ) {
+
+    window.addEventListener(
+      "load",
+      function() {
+
+        navigator.serviceWorker
+          .register(
+            "./service-worker.js"
+          )
+          .catch(function(error) {
+
+            console.log(
+              "Service Worker konnte nicht registriert werden:",
+              error
+            );
+
+          });
+
+      }
+    );
+
+  }
+
+
+  /* ==================================================
+     START
+  ================================================== */
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    init
+  );
+
+</script>
+
+</body>
+</html>
