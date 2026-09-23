@@ -1,7 +1,7 @@
 {
-  "name": "Ladecheck",
-  "short_name": "Ladecheck",
-  "description": "Ladetarife vergleichen und Ladekosten berechnen.",
+  "name": "Elveo",
+  "short_name": "Elveo",
+  "description": "Dein E-Auto Assistent",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
