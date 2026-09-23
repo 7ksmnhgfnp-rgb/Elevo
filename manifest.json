@@ -1,6 +1,6 @@
 {
-  "name": "Ladecheck",
-  "short_name": "Ladecheck",
+  "name": "Elveo - Dein Ladeassistent",
+  "short_name": "Elveo",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#E8ECEA",
